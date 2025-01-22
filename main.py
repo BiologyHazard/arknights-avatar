@@ -68,7 +68,7 @@ font_big = ImageFont.truetype(font_path, round(font_size_big * avatar_pixels))
 font_small = ImageFont.truetype(font_path, round(font_size_small * avatar_pixels))
 
 
-def make_avatar(avatar_image: Image.Image, char_name: str, elite_level: int, char_rarity: int, char_profession: str) -> Image.Image:
+def make_avatar(avatar_image: Image.Image, char_name: str, elite_level: int | None, char_rarity: int, char_profession: str) -> Image.Image:
     image_width = round((1 + 2 * horizontal_padding) * avatar_pixels)
     image_height = round((1 + font_padding) * avatar_pixels)
     image = Image.new("RGBA", (image_width, image_height), "#0000")
@@ -77,12 +77,16 @@ def make_avatar(avatar_image: Image.Image, char_name: str, elite_level: int, cha
     # 把头像粘贴到画布中上
     avatar_image = avatar_image.resize((avatar_pixels, avatar_pixels))
     image.paste(avatar_image, ((image_width - avatar_pixels) // 2, 0))
+
     # 把 elite 图片粘贴到头像的左下角
-    image.alpha_composite(elite_images[elite_level],
-                          (round(horizontal_padding * avatar_pixels), round(avatar_pixels) - elite_images[elite_level].height))
+    if elite_level is not None:
+        image.alpha_composite(elite_images[elite_level],
+                              (round(horizontal_padding * avatar_pixels), round(avatar_pixels) - elite_images[elite_level].height))
+
     # 把职业图片粘贴到头像的左上角
     image.alpha_composite(profession_images[char_profession],
                           (round(horizontal_padding * avatar_pixels), 0))
+
     # 把稀有度图片粘贴到头像的右下角
     image.alpha_composite(rarity_images[char_rarity],
                           (round((horizontal_padding + 1) * avatar_pixels) - rarity_images[char_rarity].width, round((1 - rarity_height) * avatar_pixels)))
@@ -103,8 +107,8 @@ for char_id, char_data in character_table.items():
     char_name = char_data["name"]
     char_rarity = char_data["rarity"]
     char_profession = char_data["profession"]
-    for elite_level in (0, 1, 2):
-        if elite_level in (0, 1):
+    for elite_level in (None, 0, 1, 2):
+        if elite_level in (None, 0, 1):
             avatar_path = avatar_folder / f"{char_id}.png"
         elif elite_level == 2:
             avatar_path = avatar_folder / f"{char_id}_2.png"
