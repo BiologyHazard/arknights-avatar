@@ -6,6 +6,8 @@ from PIL import Image, ImageDraw, ImageFont
 
 from professions import PROFESSION_DICT
 
+SKIP_EXISTING = True
+
 
 @lru_cache
 def _get_empty_draw() -> ImageDraw.ImageDraw:
@@ -22,7 +24,7 @@ def get_text_width(text: str, font: ImageFont.FreeTypeFont, **kwargs) -> float:
             - _get_empty_draw().multiline_textbbox((0, 0), text, font, 'ra', **kwargs)[2])
 
 
-font_path = r"C:\Windows\Fonts\SourceHanSansCN-Medium.otf"
+font_path = r"C:\Users\Administrator\AppData\Local\Microsoft\Windows\Fonts\SourceHanSansSC-Medium.otf"
 game_resource_path = Path(r"D:\BioHazard\Projects\github-clone\ArknightsGameResource")
 avatar_folder = game_resource_path / "avatar"
 with open(game_resource_path / "gamedata/excel/character_table.json", "r", encoding="utf-8") as f:
@@ -112,11 +114,20 @@ for char_id, char_data in character_table.items():
             avatar_path = avatar_folder / f"{char_id}.png"
         elif elite_level == 2:
             avatar_path = avatar_folder / f"{char_id}_2.png"
+        else:
+            raise
+
         if not avatar_path.is_file():
             print(f"Avatar not found: {str(avatar_path)!r} ({char_name!r}, elite {elite_level})")
             continue
 
+        output_path = Path("avatars") / f"{char_name}_{elite_level}.png"
+        if SKIP_EXISTING and output_path.is_file():
+            # print(f"Skipping existing: {output_path}")
+            continue
+
+        print("Making", output_path)
         avatar_image = Image.open(avatar_path)
         image = make_avatar(avatar_image, char_name, elite_level, char_rarity, char_profession)
 
-        image.save(Path("avatars") / f"{char_name}_{elite_level}.png")
+        image.save(output_path)
