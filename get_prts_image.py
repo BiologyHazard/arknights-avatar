@@ -18,7 +18,7 @@ async def download_image(url: str, path: Path):
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         response.raise_for_status()
-        with open(path, "wb") as f:
+        with path.open("wb") as f:
             f.write(response.content)
 
 
@@ -35,7 +35,9 @@ async def main():
     output_folder = Path("resources")
     image_names = []
     image_names.extend(f"精英_{i}_大图.png" for i in range(3))
-    image_names.extend(f"图标_职业_{profession}.png" for profession in PROFESSION_DICT.values())
+    image_names.extend(
+        f"图标_职业_{profession}.png" for profession in PROFESSION_DICT.values()
+    )
     image_names.extend(f"稀有度_黄_{i}.png" for i in range(6))
     # image_names = [
     #     *(f"精英_{i}_大图.png" for i in range(3)),

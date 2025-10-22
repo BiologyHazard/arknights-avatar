@@ -3,19 +3,19 @@ from pathlib import Path
 
 from PIL import Image
 
-avatars_path = Path("avatars")
+avatars_path = Path("output")
 
 
 def process_file_name(s: str) -> str:
     """
-    - "见行者" -> "见行者_None"
-    - "见行者0" -> "见行者_0"
-    - "见行者1" -> "见行者_1"
-    - "见行者2" -> "见行者_2"
+    - "见行者" -> "avatar_见行者"
+    - "见行者0" -> "avatar_见行者_0"
+    - "见行者1" -> "avatar_见行者_1"
+    - "见行者2" -> "avatar_见行者_2"
     """
     if s[-1].isdigit():
-        return f"{s[:-1]}_{s[-1]}"
-    return f"{s}_None"
+        return f"avatar_{s[:-1]}_{s[-1]}"
+    return f"avatar_{s}"
 
 
 def get_paths(s: str) -> list[Path]:
@@ -42,7 +42,10 @@ def combine_images(images: Sequence[Image.Image], gap: float) -> Image.Image:
 
 def main():
     while True:
-        input_str = input("Enter gap and image names (gap followed by space-separated names) or 'exit' to quit: ").strip()
+        input_str = input(
+            "Enter gap and image names (gap followed by space-separated names) "
+            "or 'exit' to quit: "
+        ).strip()
         if input_str.lower() == "exit":
             break
 
